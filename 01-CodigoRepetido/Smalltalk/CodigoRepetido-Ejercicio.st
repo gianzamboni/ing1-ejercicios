@@ -13,28 +13,35 @@ TestCase subclass: #IdiomTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!IdiomTest methodsFor: 'testing' stamp: 'GF 9/4/2017 23:02:24'!
+!IdiomTest methodsFor: 'testing' stamp: 'GF 9/6/2017 17:24:08'!
+assert: aClosure shouldNotTakeMoreTimeThan: someTime
+
+	| millisecondsBeforeRunning millisecondsAfterRunning |
+
+	millisecondsBeforeRunning := (Time millisecondClockValue)*millisecond.
+	aClosure value.
+	millisecondsAfterRunning := (Time millisecondClockValue)*millisecond.
+	
+	self assert: ((millisecondsAfterRunning  - millisecondsBeforeRunning ) < someTime).! !
+
+!IdiomTest methodsFor: 'testing' stamp: 'GF 9/6/2017 17:24:16'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
-	| customerBook methodDuration |
+	| customerBook |
 	
 	customerBook _ CustomerBook  new.
-	methodDuration _ self timeMethod: [ customerBook addCustomerNamed: 'John Lennon'. ].
-	
-	self assert: methodDuration < (50*millisecond)! !
+	self assert: [ customerBook addCustomerNamed: 'John Lennon'. ] shouldNotTakeMoreTimeThan: (50*millisecond).! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'GF 9/4/2017 22:47:01'!
+!IdiomTest methodsFor: 'testing' stamp: 'GF 9/6/2017 17:24:24'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
-	| customerBook paulMcCartney methodDuration |
+	| customerBook paulMcCartney |
 	
 	customerBook := CustomerBook  new.
 	paulMcCartney := 'Paul McCartney'.
 	
 	customerBook addCustomerNamed: paulMcCartney.
-	methodDuration := self timeMethod: [ customerBook removeCustomerNamed: paulMcCartney. ].
-	
-	self assert: (methodDuration) < (100*millisecond)
+	self assert: [ customerBook removeCustomerNamed: paulMcCartney. ] shouldNotTakeMoreTimeThan: 100*millisecond.
 	
 ! !
 
@@ -69,16 +76,15 @@ test04CanNotRemoveAnInvalidCustomer
 			self assert: (customerBook includesCustomerNamed: johnLennon) ]
 ! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'GF 9/4/2017 23:02:41'!
-timeMethod: aMethodToTime
+!IdiomTest methodsFor: 'testing' stamp: 'GF 9/6/2017 17:15:34'!
+timeClosure: aClosureToTime
 
 	| millisecondsBeforeRunning millisecondsAfterRunning |
 
-	millisecondsBeforeRunning := Time millisecondClockValue.
-	aMethodToTime value.
+	millisecondsBeforeRunning := Time millisecondClockValue.	
+	aClosureToTime value.
 	millisecondsAfterRunning := Time millisecondClockValue.
-	
-	^ (millisecondsAfterRunning  - millisecondsBeforeRunning)*millisecond.! !
+	^ ((millisecondsAfterRunning  - millisecondsBeforeRunning ) * millisecond).! !
 
 
 !classDefinition: #CustomerBook category: #'CodigoRepetido-Ejercicio'!
