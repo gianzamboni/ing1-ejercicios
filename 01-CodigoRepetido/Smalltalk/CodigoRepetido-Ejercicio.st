@@ -24,6 +24,14 @@ assert: aClosure shouldNotTakeMoreTimeThan: someTime
 	
 	self assert: ((millisecondsAfterRunning  - millisecondsBeforeRunning ) < someTime).! !
 
+!IdiomTest methodsFor: 'testing' stamp: 'gz 9/7/2017 01:26:22'!
+assert: aBlockClosure shouldRaise: someError andMustSatisfy: someConditions 
+
+	[ aBlockClosure value.
+		self fail ]
+		on: someError
+		do: someConditions.! !
+
 !IdiomTest methodsFor: 'testing' stamp: 'GF 9/6/2017 17:24:16'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
@@ -45,21 +53,18 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	
 ! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'HernanWilkinson 5/9/2012 18:12'!
+!IdiomTest methodsFor: 'testing' stamp: 'gz 9/7/2017 01:18:38'!
 test03CanNotAddACustomerWithEmptyName 
 
 	| customerBook |
 			
 	customerBook := CustomerBook new.
 
-	[ customerBook addCustomerNamed: ''.
-	self fail ]
-		on: Error 
-		do: [ :anError | 
+	self assert: [ customerBook addCustomerNamed: ''] shouldRaise:  Error andMustSatisfy: [ :anError | 
 			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
 			self assert: customerBook isEmpty ]! !
 
-!IdiomTest methodsFor: 'testing' stamp: 'HAW 8/28/2017 08:57:25'!
+!IdiomTest methodsFor: 'testing' stamp: 'gz 9/7/2017 01:23:36'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon |
@@ -68,10 +73,7 @@ test04CanNotRemoveAnInvalidCustomer
 	johnLennon := 'John Lennon'.
 	customerBook addCustomerNamed: johnLennon.
 	
-	[ customerBook removeCustomerNamed: 'Paul McCartney'.
-	self fail ]
-		on: NotFound 
-		do: [ :anError | 
+	self assert: [ customerBook removeCustomerNamed: 'Paul McCartney'.] shouldRaise: NotFound andMustSatisfy: [ :anError | 
 			self assert: customerBook numberOfCustomers = 1.
 			self assert: (customerBook includesCustomerNamed: johnLennon) ]
 ! !
