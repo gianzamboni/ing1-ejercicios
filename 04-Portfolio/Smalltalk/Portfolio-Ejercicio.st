@@ -403,15 +403,15 @@ balance
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
-	instanceVariableNames: ''
+	instanceVariableNames: 'accounts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'balance' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'balance' stamp: 'GF 9/24/2017 20:55:11'!
 balance
 
-	self shouldBeImplemented ! !
+	^ accounts inject: 0 into: [:balance :account | balance + account balance]! !
 
 
 !Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:39'!
@@ -420,8 +420,8 @@ manages: anAccount
 		self shouldBeImplemented 
 ! !
 
-!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:39'!
-registers: aTtransaction
+!Portfolio methodsFor: 'testing' stamp: 'GF 9/24/2017 21:11:49'!
+registers: aTransaction
 
 	self shouldBeImplemented ! !
 
@@ -436,16 +436,22 @@ transactionsOf: anAccount
 
 	self shouldBeImplemented ! !
 
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'GF 9/24/2017 20:53:29'!
+initializeWith: aReceptiveAccount andWith: aReceptiveAccount2
+
+	accounts _ Bag with: aReceptiveAccount with: aReceptiveAccount2! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:41'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'GF 9/24/2017 21:04:07'!
 with: anAccount1 with: anAccount2
 
-	self shouldBeImplemented ! !
+	^ self new initializeWith: anAccount1 andWith: anAccount2! !
 
 !Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:41'!
 withAll: aCollectionOfAccounts
