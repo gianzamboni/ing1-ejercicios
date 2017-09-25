@@ -414,30 +414,31 @@ balance
 	^ accounts inject: 0 into: [:balance :account | balance + account balance]! !
 
 
-!Portfolio methodsFor: 'testing' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'testing' stamp: 'gz 9/25/2017 01:23:51'!
 manages: anAccount
 
-		self shouldBeImplemented 
+		^ self = anAccount or: (accounts anySatisfy: [:account | account manages: anAccount]) 
 ! !
 
-!Portfolio methodsFor: 'testing' stamp: 'GF 9/24/2017 21:11:49'!
+!Portfolio methodsFor: 'testing' stamp: 'gz 9/25/2017 01:16:03'!
 registers: aTransaction
 
-	self shouldBeImplemented ! !
+	^ accounts anySatisfy: [:account | account registers: aTransaction ]! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'transactions' stamp: 'gz 9/25/2017 01:48:25'!
 transactions 
 
-	self shouldBeImplemented ! !
+	^ accounts inject: (OrderedCollection new) into: [ :transactionCollection :account | transactionCollection union: (account transactions)]
+! !
 
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:40'!
+!Portfolio methodsFor: 'transactions' stamp: 'gz 9/25/2017 01:49:03'!
 transactionsOf: anAccount 
 
-	self shouldBeImplemented ! !
+	^ anAccount transactions! !
 
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'GF 9/24/2017 20:53:29'!
+!Portfolio methodsFor: 'initialization' stamp: 'GF 9/24/2017 20:53:29'!
 initializeWith: aReceptiveAccount andWith: aReceptiveAccount2
 
 	accounts _ Bag with: aReceptiveAccount with: aReceptiveAccount2! !
