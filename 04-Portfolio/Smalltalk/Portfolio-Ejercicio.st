@@ -432,16 +432,22 @@ transactions
 	^ accounts inject: (OrderedCollection new) into: [ :transactionCollection :account | transactionCollection union: (account transactions)]
 ! !
 
-!Portfolio methodsFor: 'transactions' stamp: 'gz 9/25/2017 01:49:03'!
+!Portfolio methodsFor: 'transactions' stamp: 'GF 9/25/2017 02:26:35'!
 transactionsOf: anAccount 
+
+	(self manages: anAccount)
+		ifFalse: [self error: self class accountNotManagedMessageDescription.].
 
 	^ anAccount transactions! !
 
 
-!Portfolio methodsFor: 'initialization' stamp: 'GF 9/24/2017 20:53:29'!
-initializeWith: aReceptiveAccount andWith: aReceptiveAccount2
+!Portfolio methodsFor: 'initialization' stamp: 'GF 9/25/2017 02:33:05'!
+initializeWith: anAccount andWith: anAccount2
 
-	accounts _ Bag with: aReceptiveAccount with: aReceptiveAccount2! !
+	((anAccount manages: anAccount2) or: (anAccount2 manages: anAccount))
+		ifTrue: [self error: self class accountAlreadyManagedErrorMessage ].
+
+	accounts _ Bag with: anAccount with: anAccount2! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -458,6 +464,17 @@ with: anAccount1 with: anAccount2
 withAll: aCollectionOfAccounts
 
 	self shouldBeImplemented ! !
+
+
+!Portfolio class methodsFor: 'error handling' stamp: 'GF 9/25/2017 02:30:48'!
+accountAlreadyManagedErrorMessage
+	
+	^ 'Account already managed'! !
+
+!Portfolio class methodsFor: 'error handling' stamp: 'GF 9/25/2017 02:23:45'!
+accountNotManagedMessageDescription
+	
+	^ 'Account not managed'! !
 
 
 !classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
