@@ -1202,6 +1202,11 @@ compute
 	^ account transactions inject: 0 into: 
 				[ :transferNet :transaction | transferNet + ( transaction foreignMethod: self ). transferNet ]! !
 
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:23:56'!
+computeAsCertificateOfDeposit: aCertificateOfDeposit 
+	
+	^ 0! !
+
 !TransferNet methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 14:54:30'!
 computeAsDeposit: aDeposit 
 	
