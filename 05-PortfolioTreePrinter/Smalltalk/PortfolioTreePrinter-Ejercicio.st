@@ -784,6 +784,11 @@ compute
 	
 	^ transaction foreignMethod: self! !
 
+!AffectBalance methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:57:15'!
+computeAsCertificateOfDeposit: aCertificateOfDeposit 
+	
+	^ balance - aCertificateOfDeposit value! !
+
 !AffectBalance methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 14:32:13'!
 computeAsDeposit: aDeposit
 	
@@ -829,11 +834,11 @@ Object subclass: #InvestmentEarnings
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!InvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:13:34'!
+!InvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:55:15'!
 compute
 	
 	^ account transactions inject: 0 into: 
-				[ :earnings :transaction | earnings + ( transaction foreignMethod: self ). earnings ]! !
+				[ :earnings :transaction | earnings + ( transaction foreignMethod: self )]! !
 
 !InvestmentEarnings methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:17:01'!
 computeAsCertificateOfDeposit: aCertificateOfDeposit 
@@ -864,11 +869,11 @@ Object subclass: #InvestmentNet
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!InvestmentNet methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:00:13'!
+!InvestmentNet methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:55:35'!
 compute
 	
 	^ account transactions inject: 0 into: 
-				[ :transferNet :transaction | transferNet + ( transaction foreignMethod: self ). transferNet ]! !
+				[ :investmentNet :transaction | investmentNet + ( transaction foreignMethod: self ) ]! !
 
 !InvestmentNet methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:02:17'!
 computeAsCertificateOfDeposit: aCertificateOfDeposit 
@@ -1099,18 +1104,18 @@ Object subclass: #Summary
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!Summary methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 14:48:49'!
+!Summary methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:56:10'!
 compute
 	
 	^ account transactions inject: OrderedCollection new into: 
 				[ :collection :transaction | collection add: ( transaction foreignMethod: self ). collection ]! !
 
-!Summary methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:20:43'!
+!Summary methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 16:00:26'!
 computeAsCertificateOfDeposit: aCertificateOfDeposit 
 	
 	^ 'Plazo fijo por ', aCertificateOfDeposit value asString,
 		 ' durante ', aCertificateOfDeposit duration asString,
-		' dias a una tna de ', aCertificateOfDeposit rate asString.! !
+		' dias a una tna de ', (aCertificateOfDeposit rate * 100) asString, '%'.! !
 
 !Summary methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 14:49:58'!
 computeAsDeposit: aDeposit 
@@ -1196,11 +1201,11 @@ Object subclass: #TransferNet
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
 
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 14:56:42'!
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:54:40'!
 compute
 	
 	^ account transactions inject: 0 into: 
-				[ :transferNet :transaction | transferNet + ( transaction foreignMethod: self ). transferNet ]! !
+				[ :transferNet :transaction | transferNet + ( transaction foreignMethod: self ) ]! !
 
 !TransferNet methodsFor: 'as yet unclassified' stamp: 'GF 9/28/2017 15:23:56'!
 computeAsCertificateOfDeposit: aCertificateOfDeposit 
