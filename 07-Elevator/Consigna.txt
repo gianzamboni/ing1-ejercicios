@@ -1,0 +1,7 @@
+Nuevamente deben hacer pasar los tests y deducir el patron de diseño a partir
+ver el comportamiento que se repite.
+
+La solucion no debe hacer uso de if ni romper el encapsulamiento de los objetos
+
+Como siempre, recomendamos primero hacer pasar los tests y luego a partir de
+sacar if y codigo repetido, sin romper encapsulamiento deducir el patron.
