@@ -199,7 +199,7 @@ test20ElevatorHasToEnterEmergencyIfDoorClosesWhenOpening
 		withExceptionDo: [ :elevatorEmergency | self assert: elevatorEmergency messageText = 'Sensor de puerta desincronizado'.]! !
 
 
-!ElevatorTest methodsFor: 'tests 2' stamp: 'HernanWilkinson 7/10/2011 17:35'!
+!ElevatorTest methodsFor: 'tests 2' stamp: 'GF 10/1/2017 22:58:21'!
 test06DoorKeepsOpenedWhenOpeningIsRequested
 
 	| elevatorController |
@@ -446,6 +446,13 @@ cabinDoorClosed
 	cabinDoorState close: self.
 	cabinState closeDoor: self.! !
 
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:49:28'!
+cabinDoorOpened
+	
+	state cabinDoorOpened: self.
+	cabinState cabinDoorOpened: self.
+	cabinDoorState cabinDoorOpened: self.! !
+
 !ElevatorController methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 01:23:43'!
 cabinFloorNumber
 
@@ -535,6 +542,13 @@ isWorking
 	
 	^ state isWorking! !
 
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 23:59:53'!
+openCabinDoor
+	
+	cabinDoorState openCabinDoor: self.
+	cabinState openCabinDoor: self.
+	state openCabinDoor: self.! !
+
 
 !classDefinition: #ElevatorControllerCabinDoorState category: #'Elevator-Ejercicio'!
 Object subclass: #ElevatorControllerCabinDoorState
@@ -542,6 +556,11 @@ Object subclass: #ElevatorControllerCabinDoorState
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!ElevatorControllerCabinDoorState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:52:54'!
+cabinDoorOpened: anElevatorController 
+	
+	^ self subclassResponsibility ! !
 
 !ElevatorControllerCabinDoorState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 02:25:40'!
 cabinOnFloor: aSmallInteger on: anElevatorController 
@@ -578,6 +597,11 @@ isOpening
 	
 	^ self subclassResponsibility ! !
 
+!ElevatorControllerCabinDoorState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 23:56:21'!
+openCabinDoor: anElevatorController 
+	
+	^ self subclassResponsibility ! !
+
 
 !classDefinition: #ElevatorControllerCabinDoorClosed category: #'Elevator-Ejercicio'!
 ElevatorControllerCabinDoorState subclass: #ElevatorControllerCabinDoorClosed
@@ -611,6 +635,9 @@ isOpening
 	
 	^ false! !
 
+!ElevatorControllerCabinDoorClosed methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 23:59:19'!
+openCabinDoor: anElevatorController ! !
+
 
 !classDefinition: #ElevatorControllerCabinDoorClosing category: #'Elevator-Ejercicio'!
 ElevatorControllerCabinDoorState subclass: #ElevatorControllerCabinDoorClosing
@@ -639,6 +666,11 @@ isOpen
 	
 	^ false! !
 
+!ElevatorControllerCabinDoorClosing methodsFor: 'as yet unclassified' stamp: 'GF 10/2/2017 00:04:06'!
+openCabinDoor: anElevatorController 
+	
+	anElevatorController changeDoorStateTo: ( ElevatorControllerCabinDoorOpening new ) ! !
+
 
 !ElevatorControllerCabinDoorClosing methodsFor: 'associating' stamp: 'GF 10/1/2017 02:00:19'!
 isOpening
@@ -658,10 +690,29 @@ goUpPushedFromFloor: aSmallInteger on: anElevatorController
 	
 	anElevatorController changeCabinDoorStateTo: (ElevatorControllerCabinDoorClosing new )! !
 
+!ElevatorControllerCabinDoorOpened methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:54:44'!
+isClosed
+	
+	^ false! !
+
+!ElevatorControllerCabinDoorOpened methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:54:33'!
+isClosing
+	
+	^ false! !
+
 !ElevatorControllerCabinDoorOpened methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 01:21:24'!
 isOpen
 	
 	^ true! !
+
+!ElevatorControllerCabinDoorOpened methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:54:24'!
+isOpening
+	
+	^ false! !
+
+!ElevatorControllerCabinDoorOpened methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 23:56:28'!
+openCabinDoor: anElevatorController 
+	! !
 
 
 !classDefinition: #ElevatorControllerCabinDoorOpening category: #'Elevator-Ejercicio'!
@@ -670,6 +721,11 @@ ElevatorControllerCabinDoorState subclass: #ElevatorControllerCabinDoorOpening
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!ElevatorControllerCabinDoorOpening methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:53:44'!
+cabinDoorOpened: anElevatorController 
+	
+	anElevatorController changeDoorStateTo: ( ElevatorControllerCabinDoorOpened new )! !
 
 !ElevatorControllerCabinDoorOpening methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 02:27:59'!
 isClosed
@@ -691,6 +747,11 @@ isOpening
 	
 	^ true! !
 
+!ElevatorControllerCabinDoorOpening methodsFor: 'as yet unclassified' stamp: 'GF 10/2/2017 00:04:44'!
+openCabinDoor: anElevatorController 
+	
+	! !
+
 
 !classDefinition: #ElevatorControllerCabinState category: #'Elevator-Ejercicio'!
 Object subclass: #ElevatorControllerCabinState
@@ -698,6 +759,11 @@ Object subclass: #ElevatorControllerCabinState
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!ElevatorControllerCabinState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:51:16'!
+cabinDoorOpened: anElevatorController 
+	
+	^ self subclassResponsibility ! !
 
 !ElevatorControllerCabinState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 02:24:02'!
 cabinOnFloor: aSmallInteger on: anElevatorController 
@@ -724,6 +790,11 @@ isStopped
 	
 	^ self subclassResponsibility ! !
 
+!ElevatorControllerCabinState methodsFor: 'as yet unclassified' stamp: 'GF 10/2/2017 00:00:04'!
+openCabinDoor: anElevatorController 
+	
+	^ self subclassResponsibility ! !
+
 
 !classDefinition: #ElevatorControllerCabinMoving category: #'Elevator-Ejercicio'!
 ElevatorControllerCabinState subclass: #ElevatorControllerCabinMoving
@@ -747,6 +818,11 @@ isStopped
 	
 	^ false! !
 
+!ElevatorControllerCabinMoving methodsFor: 'as yet unclassified' stamp: 'GF 10/2/2017 00:00:24'!
+openCabinDoor: anElevatorController 
+	
+	! !
+
 
 !classDefinition: #ElevatorControllerCabinStopped category: #'Elevator-Ejercicio'!
 ElevatorControllerCabinState subclass: #ElevatorControllerCabinStopped
@@ -754,6 +830,10 @@ ElevatorControllerCabinState subclass: #ElevatorControllerCabinStopped
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!ElevatorControllerCabinStopped methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:52:42'!
+cabinDoorOpened: anElevatorController 
+	! !
 
 !ElevatorControllerCabinStopped methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 02:13:07'!
 closeDoor: anElevatorController 
@@ -773,6 +853,11 @@ isStopped
 	
 	^ true! !
 
+!ElevatorControllerCabinStopped methodsFor: 'as yet unclassified' stamp: 'GF 10/2/2017 00:01:52'!
+openCabinDoor: anElevatorController 
+	
+	! !
+
 
 !classDefinition: #ElevatorControllerState category: #'Elevator-Ejercicio'!
 Object subclass: #ElevatorControllerState
@@ -780,6 +865,11 @@ Object subclass: #ElevatorControllerState
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!ElevatorControllerState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:49:44'!
+cabinDoorOpened: anElevatorController 
+	
+	^ self subclassResponsibility ! !
 
 !ElevatorControllerState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 02:26:45'!
 cabinOnFloor: aSmallInteger on: anElevatorController 
@@ -794,6 +884,11 @@ isIdle
 !ElevatorControllerState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 01:51:01'!
 isWorking
 
+	^ self subclassResponsibility ! !
+
+!ElevatorControllerState methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:56:23'!
+openCabinDoor: anElevatorController 
+	
 	^ self subclassResponsibility ! !
 
 
@@ -814,6 +909,15 @@ isIdle
 	
 	^ true! !
 
+!ElevatorControllerIdle methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:54:04'!
+isWorking
+	
+	^ false! !
+
+!ElevatorControllerIdle methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:57:35'!
+openCabinDoor: anElevatorController 
+! !
+
 
 !classDefinition: #ElevatorControllerWorking category: #'Elevator-Ejercicio'!
 ElevatorControllerState subclass: #ElevatorControllerWorking
@@ -821,6 +925,11 @@ ElevatorControllerState subclass: #ElevatorControllerWorking
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!ElevatorControllerWorking methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 22:50:50'!
+cabinDoorOpened: anElevatorController 
+	
+	anElevatorController changeStateTo: ( ElevatorControllerIdle new ).! !
 
 !ElevatorControllerWorking methodsFor: 'as yet unclassified' stamp: 'GF 10/1/2017 02:27:05'!
 cabinOnFloor: aSmallInteger on: anElevatorController ! !
@@ -834,3 +943,8 @@ isIdle
 isWorking
 	
 	^ true! !
+
+!ElevatorControllerWorking methodsFor: 'as yet unclassified' stamp: 'GF 10/2/2017 00:00:34'!
+openCabinDoor: anElevatorController 
+	
+	! !
