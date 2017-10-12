@@ -11,6 +11,11 @@ Error subclass: #ElevatorEmergency
 ElevatorEmergency class
 	instanceVariableNames: ''!
 
+!ElevatorEmergency class methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 15:55:53'!
+desynchronizedDoorSensorDescription
+	
+	^ 'Sensor de puerta desincronizado'! !
+
 !ElevatorEmergency class methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 02:25:11'!
 desynchronizedSensorDescription
 	
@@ -76,6 +81,11 @@ CabinDoorState subclass: #CabinDoorClosed
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!CabinDoorClosed methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 16:00:33'!
+closedOn: aCabinDoorController 
+	
+	aCabinDoorController closedWhileClosed.! !
 
 !CabinDoorClosed methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 18:39:34'!
 isClosed
@@ -158,6 +168,11 @@ close: aCabinDoorController
 	
 	aCabinDoorController closeOpenedDoor	! !
 
+!CabinDoorOpened methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 15:54:47'!
+closedOn: aCabinDoorController 
+	
+	aCabinDoorController closedWhileDoorOpened.! !
+
 !CabinDoorOpened methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 19:49:43'!
 isClosed
 
@@ -180,6 +195,11 @@ CabinDoorState subclass: #CabinDoorOpening
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!CabinDoorOpening methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 16:01:12'!
+closedOn: aCabinDoorController 
+	
+	aCabinDoorController closedWhileOpening.! !
 
 !CabinDoorOpening methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 19:42:34'!
 isClosed
@@ -677,6 +697,11 @@ cabinDoorClosed
 	
 	state cabinDoorClosedOn: self ! !
 
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 16:00:09'!
+cabinDoorClosedWhileMoving
+	
+	cabinDoorController closed.! !
+
 !CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 18:30:03'!
 cabinDoorClosedWhileStopped
 
@@ -744,8 +769,11 @@ stopMovingOnFloor: aSmallInteger
 	state _ CabinStopped new.
 	floorNumber _ aSmallInteger.! !
 
-!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:58:57'!
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 15:53:34'!
 stopOnFloor: aSmallInteger 
+
+	( (floorNumber - aSmallInteger) abs = 1 ) ifFalse:
+		[ ElevatorEmergency signal: ElevatorEmergency desynchronizedSensorDescription ]. 
 	
 	state stop: self onFloor: aSmallInteger ! !
 
@@ -824,6 +852,21 @@ closeOpenedDoor
 closed
 	
 	state closedOn: self! !
+
+!CabinDoorController methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 16:00:48'!
+closedWhileClosed
+	
+	ElevatorEmergency signal: ElevatorEmergency desynchronizedDoorSensorDescription.! !
+
+!CabinDoorController methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 15:57:30'!
+closedWhileDoorOpened
+	
+	ElevatorEmergency signal: ElevatorEmergency desynchronizedDoorSensorDescription.! !
+
+!CabinDoorController methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 16:01:27'!
+closedWhileOpening
+	
+	ElevatorEmergency signal: ElevatorEmergency desynchronizedDoorSensorDescription ! !
 
 !CabinDoorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 18:38:43'!
 finishClosing
@@ -928,6 +971,11 @@ CabinState subclass: #CabinMoving
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Elevator-Ejercicio'!
+
+!CabinMoving methodsFor: 'as yet unclassified' stamp: 'GF 10/12/2017 15:58:32'!
+cabinDoorClosedOn: aCabinController 
+	
+	aCabinController cabinDoorClosedWhileMoving.! !
 
 !CabinMoving methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 18:34:38'!
 isMoving
