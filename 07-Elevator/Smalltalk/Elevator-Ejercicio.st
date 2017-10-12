@@ -682,6 +682,11 @@ cabinDoorOpenedWhileStopped
 	
 	cabinDoorController opened! !
 
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:23:04'!
+cabinDoorOpenedWhileWaitingForPeople
+	
+	cabinDoorController opened! !
+
 !CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 18:02:13'!
 closeCabinDoor
 	
@@ -701,6 +706,11 @@ isCabinDoorClosing
 isMoving
 	
 	^ state isMoving ! !
+
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:12:16'!
+isWaitingForPeople
+	
+	^ state isWaitingForPeople! !
 
 !CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 22:57:27'!
 openCabinDoor
@@ -728,6 +738,16 @@ stopMovingOnFloor: aSmallInteger
 stopOnFloor: aSmallInteger 
 	
 	state stop: self onFloor: aSmallInteger ! !
+
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:21:00'!
+waitForPeople
+	
+	state waitForPeopleIn: self ! !
+
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:21:59'!
+whileStoppedWaitForPeople
+	
+	state _ CabinWaitForPeople new! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -849,6 +869,11 @@ isMoving
 	
 	^ self subclassResponsibility ! !
 
+!CabinState methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:12:29'!
+isWaitingForPeople
+	
+	^ self subclassResponsibility ! !
+
 !CabinState methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 22:59:49'!
 openCabinDoorOf: aCabinController 
 	
@@ -915,10 +940,38 @@ isMoving
 	
 	^ false! !
 
+!CabinStopped methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:12:41'!
+isWaitingForPeople
+	
+	^ false! !
+
 !CabinStopped methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 23:00:40'!
 openCabinDoorOf: aCabinController 
 	
 	aCabinController openDoorWhileStopped! !
+
+!CabinStopped methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:21:39'!
+waitForPeopleIn: aCabinController 
+	
+	aCabinController whileStoppedWaitForPeople! !
+
+
+!classDefinition: #CabinWaitForPeople category: #'Elevator-Ejercicio'!
+CabinState subclass: #CabinWaitForPeople
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Elevator-Ejercicio'!
+
+!CabinWaitForPeople methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:22:42'!
+cabinDoorOpenedOn: aCabinController 
+	
+	aCabinController cabinDoorOpenedWhileWaitingForPeople! !
+
+!CabinWaitForPeople methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:23:18'!
+isWaitingForPeople
+
+	^ true! !
 
 
 !classDefinition: #ElevatorController category: #'Elevator-Ejercicio'!
@@ -982,11 +1035,19 @@ cabinDoorOpened
 	
 	state cabinDoorOpenedOn: self! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 19:45:02'!
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:20:19'!
 cabinDoorOpenedWhileWorking
 	
-	state _ ElevatorIdle new.
-	cabinController cabinDoorOpened! !
+	( floorsToGo isEmpty) 
+		ifTrue: [
+			state _ ElevatorIdle new.
+		]
+		ifFalse: [
+			cabinController waitForPeople		
+		].
+	
+	cabinController cabinDoorOpened
+! !
 
 !ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 19:09:31'!
 cabinOnFloor: aSmallInteger 
@@ -1007,6 +1068,11 @@ isCabinDoorClosed
 isCabinDoorOpening
 	
 	^ cabinController isCabinDoorOpening ! !
+
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:11:54'!
+isCabinWaitingForPeople
+	
+	^ cabinController isWaitingForPeople! !
 
 !ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 19:50:59'!
 openCabinDoor
