@@ -1,0 +1,6 @@
+Nuevamente deben hacer pasar los tests y deducir el patron de diseño a partir
+ver el comportamiento que se repite.
+
+La solucion debe permitir poder agregar varios objetos del estilo de la
+consola o la view sin que haya que hacer modificaciones a ninguna de las
+clases de la solucion (una vez implementada la solucion claro)
