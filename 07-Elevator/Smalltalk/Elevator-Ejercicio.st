@@ -1028,10 +1028,14 @@ whileIdleGoUpPushedFromFloor: aSmallInteger
 	floorsToGo add: aSmallInteger.
 	cabinController closeCabinDoor! !
 
-!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 23:55:15'!
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 00:42:17'!
 whileWorkingCabinOnFloor: aSmallInteger 
 
-	self shouldBeImplemented ! !
+	(floorsToGo includes: aSmallInteger) 
+		ifTrue: [
+			floorsToGo remove: aSmallInteger.
+			cabinController stopOnFloor: aSmallInteger 
+			]! !
 
 !ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 23:46:44'!
 whileWorkingGoUpPushedFromFloor: aSmallInteger 
