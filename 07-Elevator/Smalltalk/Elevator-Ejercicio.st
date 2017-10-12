@@ -744,6 +744,24 @@ waitForPeople
 	
 	state waitForPeopleIn: self ! !
 
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:33:09'!
+waitForPeopleTimedOut
+	
+	state waitForPeopleTimedOutOn: self! !
+
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:42:31'!
+waitForPeopleTimedOutWhileMoving
+	! !
+
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:43:26'!
+waitForPeopleTimedOutWhileStopped! !
+
+!CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:34:47'!
+waitForPeopleTimedOutWhileWaitingForPeople
+	
+	state _ CabinStopped new.
+	cabinDoorController close! !
+
 !CabinController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:21:59'!
 whileStoppedWaitForPeople
 	
@@ -884,6 +902,11 @@ stop: aCabinController onFloor: aSmallInteger
 
 	^self subclassResponsibility ! !
 
+!CabinState methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:33:18'!
+waitForPeopleTimedOutOn: aCabinController 
+	
+	^ self subclassResponsibility ! !
+
 
 !classDefinition: #CabinMoving category: #'Elevator-Ejercicio'!
 CabinState subclass: #CabinMoving
@@ -911,6 +934,11 @@ openCabinDoorOf: aCabinController
 stop: aCabinController onFloor: aSmallInteger 
 	
 	aCabinController stopMovingOnFloor: aSmallInteger! !
+
+!CabinMoving methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:42:20'!
+waitForPeopleTimedOutOn: aCabinController 
+	
+	aCabinController waitForPeopleTimedOutWhileMoving! !
 
 
 !classDefinition: #CabinStopped category: #'Elevator-Ejercicio'!
@@ -955,6 +983,11 @@ waitForPeopleIn: aCabinController
 	
 	aCabinController whileStoppedWaitForPeople! !
 
+!CabinStopped methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:43:16'!
+waitForPeopleTimedOutOn: aCabinController 
+	
+	aCabinController  waitForPeopleTimedOutWhileStopped! !
+
 
 !classDefinition: #CabinWaitForPeople category: #'Elevator-Ejercicio'!
 CabinState subclass: #CabinWaitForPeople
@@ -972,6 +1005,11 @@ cabinDoorOpenedOn: aCabinController
 isWaitingForPeople
 
 	^ true! !
+
+!CabinWaitForPeople methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:33:56'!
+waitForPeopleTimedOutOn: aCabinController 
+	
+	aCabinController waitForPeopleTimedOutWhileWaitingForPeople! !
 
 
 !classDefinition: #ElevatorController category: #'Elevator-Ejercicio'!
@@ -1054,6 +1092,19 @@ cabinOnFloor: aSmallInteger
 
 	state cabinOf: self onFloor: aSmallInteger ! !
 
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:35:26'!
+closeCabinDoor
+	
+	state closeCabinDoorOn: self! !
+
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:41:33'!
+closeCabinDoorWhileIdle! !
+
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:37:40'!
+closeCabinDoorWhileWorking
+
+	cabinController waitForPeopleTimedOut ! !
+
 !ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 23:15:37'!
 goUpPushedFromFloor: aSmallInteger 
 	
@@ -1086,6 +1137,16 @@ openCabinDoorWhileIddle! !
 openCabinDoorWhileWorking
 	
 	cabinController openCabinDoor! !
+
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:29:59'!
+waitForPeopleTimedOut
+	
+	state waitForPeopleTimedOutOn: self! !
+
+!ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:32:44'!
+waitForPeopleTimedOutWhileWorking
+	
+	cabinController waitForPeopleTimedOut ! !
 
 !ElevatorController methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 23:48:53'!
 whileIdleGoUpPushedFromFloor: aSmallInteger
@@ -1141,6 +1202,11 @@ cabinOf: anElevatorController onFloor: aSmallInteger
 	
 	^self subclassResponsibility ! !
 
+!ElevatorState methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:40:07'!
+closeCabinDoorOn: anElevatorController 
+	
+	^ self subclassResponsibility ! !
+
 !ElevatorState methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 23:27:59'!
 goUpPushedFromFloor: aSmallInteger on: anElevatorController 
 	
@@ -1148,6 +1214,11 @@ goUpPushedFromFloor: aSmallInteger on: anElevatorController
 
 !ElevatorState methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 19:51:27'!
 openCabinDoorOf: anElevatorController 
+	
+	^ self subclassResponsibility .! !
+
+!ElevatorState methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:30:14'!
+waitForPeopleTimedOutOn: anElevatorController 
 	
 	^ self subclassResponsibility .! !
 
@@ -1163,6 +1234,11 @@ ElevatorState subclass: #ElevatorIdle
 isIdle
 	^ true.! !
 
+
+!ElevatorIdle methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:41:17'!
+closeCabinDoorOn: anElevatorController 
+	
+	anElevatorController closeCabinDoorWhileIdle! !
 
 !ElevatorIdle methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 23:19:28'!
 goUpPushedFromFloor: aSmallInteger on: anElevatorController 
@@ -1208,7 +1284,17 @@ cabinOf: anElevatorController onFloor: aSmallInteger
 	
 	anElevatorController whileWorkingCabinOnFloor: aSmallInteger ! !
 
+!ElevatorWorking methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:40:53'!
+closeCabinDoorOn: anElevatorController 
+	
+	anElevatorController closeCabinDoorWhileWorking ! !
+
 !ElevatorWorking methodsFor: 'as yet unclassified' stamp: 'GZ 10/11/2017 19:53:06'!
 openCabinDoorOf: anElevatorController 
 	
 	anElevatorController openCabinDoorWhileWorking! !
+
+!ElevatorWorking methodsFor: 'as yet unclassified' stamp: 'GZ 10/12/2017 01:31:06'!
+waitForPeopleTimedOutOn: anElevatorController 
+	
+	anElevatorController waitForPeopleTimedOutWhileWorking! !
