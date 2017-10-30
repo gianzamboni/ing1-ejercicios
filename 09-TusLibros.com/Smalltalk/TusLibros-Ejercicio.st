@@ -5,7 +5,7 @@ TestCase subclass: #TusLibrosTest
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 21:36:37'!
+!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 13:10:22'!
 test01createCartConIdentificacionValidaDevuelveUnaIDdeCarrito
 	
 	| server userDict cartID |
@@ -15,7 +15,7 @@ test01createCartConIdentificacionValidaDevuelveUnaIDdeCarrito
 	
 	cartID _ server createCartWithUser: 'pepe' andPass: 'pipo123'.
 	self assert: ( cartID = 1 ) .
-	self assert: ( server cartIDExists: 1 ).! !
+	self assert: ( server validateCartID: 1 ).! !
 
 !TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 21:49:30'!
 test02createCartConIdentificacionInvalidaDevuelveDescripcionDeError
@@ -44,9 +44,6 @@ test03addToCartConDatosValidosAgregaCorrectamenteElLibroACarritoVacio
 	
 	self assert: ( server inCart: cartID book: 123 isTimes: 3 ).! !
 
-!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 20:09:53'!
-test04addToCartConCarritoInvalidoDevuelveDescripcionDeError! !
-
 !TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 22:13:02'!
 test04addToCartConDatosValidosAgregaCorrectamenteUnLibroYaIncluido
 
@@ -64,8 +61,19 @@ test04addToCartConDatosValidosAgregaCorrectamenteUnLibroYaIncluido
 	
 	self assert: ( server inCart: cartID book: 123 isTimes: 5 ).! !
 
-!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 20:10:18'!
-test05addToCartConLibroInvalidoDevuelveDescripcionDeError! !
+!TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 13:02:17'!
+test05addToCartConLibroInvalidoDevuelveDescripcionDeError
+
+	| server userDict cartID bookDict |
+	userDict _ Dictionary new.
+	userDict at: 'pepe' put: 'pipo123' .
+	bookDict _ OrderedCollection new.
+	server _ (ServerSimulator withUsers: userDict) withBooks: bookDict.
+	cartID _ server createCartWithUser: 'pepe' andPass: 'pipo123'.
+	
+	self should: [ server addBook: 123 withQuantity: 3 toCart: cartID. ]
+		  raise: Error
+		  withExceptionDo: [ :anError | self assert: anError messageText = 'Invalid book'].! !
 
 !TusLibrosTest methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 20:05:07'!
 testXXlistCartDeCarritoConMultiplesElementosDevuelve0yLibrosConCantidades! !
@@ -87,11 +95,11 @@ Object subclass: #Cart
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!Cart methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 22:17:27'!
+!Cart methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 12:56:46'!
 addBook: aBook times: aQuantity
 	
 	( books includesKey: aBook ) 
-		ifTrue: [ books at: aBook put: (books at: aBook + aQuantity) ]
+		ifTrue: [ books at: aBook put: ((books at: aBook) + aQuantity) ]
 		ifFalse: [ books at: aBook put: aQuantity ]! !
 
 !Cart methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 22:10:21'!
@@ -116,16 +124,14 @@ Object subclass: #ServerSimulator
 WithUsers: aUserDictionary 
 	users _ aUserDictionary! !
 
-!ServerSimulator methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 22:12:22'!
+!ServerSimulator methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 13:12:29'!
 addBook: aBook withQuantity: aQuantity toCart: aCartID
-	(carts at: aCartID)
-		addBook: aBook
-		times: aQuantity.! !
 
-!ServerSimulator methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 21:37:47'!
-cartIDExists: aCartID
-	^ carts includesKey: aCartID.
-	! !
+	( self validateBook: aBook )
+		ifTrue: [ (carts at: aCartID)
+				   addBook: aBook
+				   times: aQuantity. ]
+		ifFalse: [ self error: self class InvalidBookDescription]! !
 
 !ServerSimulator methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 21:28:00'!
 createCartWith: aCartID
@@ -157,6 +163,16 @@ initializeWithUsers: aUserDictionary
 	users _ aUserDictionary .
 	! !
 
+!ServerSimulator methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 13:10:58'!
+validateBook: aBook
+	
+	^ books includes: aBook! !
+
+!ServerSimulator methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 13:11:41'!
+validateCartID: aCartID
+
+	^ carts includesKey: aCartID.! !
+
 !ServerSimulator methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 21:48:39'!
 validateUser: aUser andPass: aPassword 
 	
@@ -175,6 +191,11 @@ withBooks: aBookDict
 !classDefinition: 'ServerSimulator class' category: #'TusLibros-Ejercicio'!
 ServerSimulator class
 	instanceVariableNames: ''!
+
+!ServerSimulator class methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 13:13:00'!
+InvalidBookDescription
+	
+	^ 'Invalid book'! !
 
 !ServerSimulator class methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 21:48:59'!
 InvalidUserOrPasswordDescription
