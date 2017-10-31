@@ -1,0 +1,24 @@
+* Crear objeto tarjeta (deberiamos hacerlo ya para el test de tarjeta vencida)
+	* Sabe si esta vencida o no respecto de alguna fecha
+* Crear objeto cajero
+	* Se encarga de crear el ticket y de cerrar la compra del carrito. Registra la compra en un libro de ventas
+* Crear objeto libro
+	* El libro sin precio sigue siendo un libro. Por lo que no debería estár dentro de este objeto
+* Debemos tener una lista de precios
+	*Pensar en la analogía de lo que debe hacer una persona para poder realizar la accion de venta. (Nos fijamos los libros en una lista de precios)
+	El cátalogo se convierte en un diccionario, entonces el elemento. El elemento se valoriza a si mismo pasandole un catalogo
+
+* El cajero:
+	Hace el checkout y se comunica con el manager ese.
+
+* Objeto Sale (Venta)
+
+* El nombre del owner no puede ser mas de 30 caracteres es del merchant procesor, esta validación no debería estar en la tarjeta de credito. El chashier debe cortar el nombre a 30 caracteres.
+
+* Una vez que el cajero obtiene el total, queremos debitar el total de la tarjeta de crédito correspondiente. Para eso debemos comunicarnos con un simulador del Merchant Processor. Cuando testeamos el cajero, testeamos la cara interna del merchan processor.
+
+Debemos configurar el objeto simulador para que actue de acuerdo a los párametros. (Por ejemplos, si pasamos tal tarjeta como parametro el simulador debería indicar que la tarjeta esta expirada.
+
+* No se puede hacer checkout con uNa tarjeta robada, sin crédito, ni sin identidad.
+
+* Si la tarjeta está vencida no deberíamos comunicarnos con el merchant processor.
