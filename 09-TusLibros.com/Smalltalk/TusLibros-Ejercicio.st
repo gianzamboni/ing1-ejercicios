@@ -1,11 +1,19 @@
-!classDefinition: #TusLibrosTest category: #'TusLibros-Ejercicio'!
-TestCase subclass: #TusLibrosTest
+!classDefinition: #CartTest category: #'TusLibros-Ejercicio'!
+TestCase subclass: #CartTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!TusLibrosTest methodsFor: 'createCart' stamp: 'GF 10/31/2017 00:16:53'!
+
+!classDefinition: #MarketTest category: #'TusLibros-Ejercicio'!
+TestCase subclass: #MarketTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Ejercicio'!
+
+!MarketTest methodsFor: 'createCart' stamp: 'GF 10/31/2017 00:16:53'!
 test01createCartConIdentificacionValidaDevuelveUnaIDdeCarrito
 	| server userDict cartID |
 	userDict _ Dictionary new.
@@ -19,7 +27,7 @@ test01createCartConIdentificacionValidaDevuelveUnaIDdeCarrito
 	self assert: cartID = 1.
 	self assert: (server cart: 1) isEmpty.! !
 
-!TusLibrosTest methodsFor: 'createCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'createCart' stamp: 'GF 10/31/2017 00:16:53'!
 test02createCartConIdentificacionInvalidaDevuelveDescripcionDeError
 	| server |
 	server _ Market new.
@@ -33,16 +41,16 @@ test02createCartConIdentificacionInvalidaDevuelveDescripcionDeError
 			self assert: anError messageText = 'Invalid user or password' ].! !
 
 
-!TusLibrosTest methodsFor: 'addToCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 15:23:04'!
 test03addToCartConDatosValidosAgregaCorrectamenteElLibroACarritoVacio
-	| server userDict cartID bookDict |
+	| server userDict cartID catalog |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	bookDict _ OrderedCollection new.
-	bookDict add: 123.
-	server _ (Market new withUsers: userDict) withBooks: bookDict.
+	catalog _ Dictionary new.
+	catalog at: 123 put: 10 *peso.
+	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'.
@@ -55,16 +63,16 @@ test03addToCartConDatosValidosAgregaCorrectamenteElLibroACarritoVacio
 			hasBook: 123
 			times: 3).! !
 
-!TusLibrosTest methodsFor: 'addToCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 15:23:31'!
 test04addToCartConDatosValidosAgregaCorrectamenteUnLibroYaIncluido
-	| server userDict cartID bookDict |
+	| server userDict cartID catalog |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	bookDict _ OrderedCollection new.
-	bookDict add: 123.
-	server _ (Market new withUsers: userDict) withBooks: bookDict.
+	catalog _ Dictionary new.
+	catalog at: 123 put: 10 *peso.
+	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'.
@@ -81,15 +89,14 @@ test04addToCartConDatosValidosAgregaCorrectamenteUnLibroYaIncluido
 			hasBook: 123
 			times: 5).! !
 
-!TusLibrosTest methodsFor: 'addToCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 15:23:46'!
 test05addToCartConLibroInvalidoLevanteError
-	| server userDict cartID bookDict |
+	| server userDict cartID |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	bookDict _ OrderedCollection new.
-	server _ (Market new withUsers: userDict) withBooks: bookDict.
+	server _ (Market new withUsers: userDict).
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'.
@@ -104,16 +111,16 @@ test05addToCartConLibroInvalidoLevanteError
 			self assert: anError messageText = 'Invalid book'.
 			self assert: (server cart: cartID) isEmpty ].! !
 
-!TusLibrosTest methodsFor: 'addToCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 15:23:58'!
 test06addToCartConDatosValidosPeroCantidadInvalidaLevantaError
-	| server userDict cartID bookDict |
+	| server userDict cartID catalog |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	bookDict _ OrderedCollection new.
-	bookDict add: 123.
-	server _ (Market new withUsers: userDict) withBooks: bookDict.
+	catalog _ Dictionary new.
+	catalog at: 123 put: 10 *peso.
+	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'.
@@ -128,12 +135,12 @@ test06addToCartConDatosValidosPeroCantidadInvalidaLevantaError
 			self assert: anError messageText = 'Invalid quantity'.
 			self assert: (server cart: cartID) isEmpty ].! !
 
-!TusLibrosTest methodsFor: 'addToCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 15:24:19'!
 test07addToCartConCarritoInvalidoLevantaError
-	| server bookDict |
-	bookDict _ OrderedCollection new.
-	bookDict add: 123.
-	server _ Market new withBooks: bookDict.
+	| server catalog |
+	catalog _ Dictionary new.
+	catalog at: 123 put: 10 *peso.
+	server _ (Market new) withBooksAndPrices: catalog.
 	self
 		should: [
 			server
@@ -145,32 +152,30 @@ test07addToCartConCarritoInvalidoLevantaError
 			self assert: anError messageText = 'Invalid cart' ].! !
 
 
-!TusLibrosTest methodsFor: 'listCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'listCart' stamp: 'GF 11/2/2017 15:26:00'!
 test08listCartDeCarritoVacioDevuelveUnaColeccionVacia
-	| server userDict cartID bookDict |
+	| server userDict cartID |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	bookDict _ OrderedCollection new.
-	bookDict add: 123.
-	server _ (Market new withUsers: userDict) withBooks: bookDict.
+	server _ Market new withUsers: userDict.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'.
 	self assert: (server listCart: cartID) isEmpty.! !
 
-!TusLibrosTest methodsFor: 'listCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'listCart' stamp: 'GF 11/2/2017 15:25:03'!
 test09listCartDeCarritoConElementosListaLosLibrosAgregados
-	| server userDict cartID bookDict expectedList |
+	| server userDict cartID catalog expectedList |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	bookDict _ OrderedCollection new.
-	bookDict add: 1.
-	bookDict add: 2.
-	server _ (Market new withUsers: userDict) withBooks: bookDict.
+	catalog _ Dictionary new.
+	catalog at: 1 put: 10 *peso.
+	catalog at: 2 put: 15 *peso.
+	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'.
@@ -191,7 +196,7 @@ test09listCartDeCarritoConElementosListaLosLibrosAgregados
 		put: 2.
 	self assert: expectedList = (server listCart: cartID).! !
 
-!TusLibrosTest methodsFor: 'listCart' stamp: 'GF 10/31/2017 00:16:53'!
+!MarketTest methodsFor: 'listCart' stamp: 'GF 10/31/2017 00:16:53'!
 test10listCartDeCarritoInvalidoLevantaError
 	| server |
 	server _ Market new.
@@ -202,8 +207,8 @@ test10listCartDeCarritoInvalidoLevantaError
 			self assert: anError messageText = 'Invalid cart' ].! !
 
 
-!TusLibrosTest methodsFor: 'checkOutCart' stamp: 'GF 10/31/2017 00:56:26'!
-test11checkOutConCarrritoVacioLevantaError
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 15:32:34'!
+test11checkOutConCarritoVacioLevantaError
 	| server userDict cartID creditCard |
 	userDict _ Dictionary new.
 	userDict
@@ -215,7 +220,7 @@ test11checkOutConCarrritoVacioLevantaError
 		andPass: 'pipo123'.
 		
 	creditCard _ CreditCard withNumber: 123 
-								   date: DateAndTime now yearNumber + 1 + 10000
+								   date: DateAndTime tomorrow
 								   andOwner: 'Pepito'.
 								
 	self
@@ -225,16 +230,16 @@ test11checkOutConCarrritoVacioLevantaError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = 'Empty cart' ].! !
 
-!TusLibrosTest methodsFor: 'checkOutCart' stamp: 'GF 10/31/2017 00:16:53'!
-test11checkOutConTarjetaVencidaLevantaError
-	| server userDict cartID bookDict aCreditCardNumber aCreditCardExpirationDate aCreditCardOwner |
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 15:25:36'!
+test12checkOutConTarjetaVencidaLevantaError
+	| server userDict cartID catalog creditCard |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	bookDict _ OrderedCollection new.
-	bookDict add: 123.
-	server _ (Market new withUsers: userDict) withBooks: bookDict.
+	catalog _ Dictionary new.
+	catalog at: 123 put: 10 *peso.
+	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'.
@@ -242,24 +247,81 @@ test11checkOutConTarjetaVencidaLevantaError
 		addBook: 123
 		withQuantity: 2
 		toCart: cartID.
-	aCreditCardNumber _ 123.
-	aCreditCardExpirationDate _ DateAndTime now yearNumber - 1 + 10000.
-	aCreditCardOwner _ 'Pepito'.
+		
+	creditCard _ CreditCard withNumber: 123 
+								   date: DateAndTime yesterday
+								   andOwner: 'Pepito'.
+				
 	self
 		should: [
 			server
 				checkOutCart: cartID
-				withCreditCardNumber: aCreditCardNumber
-				withExpirationDate: aCreditCardExpirationDate
-				andOwner: aCreditCardOwner ]
+				withCreditCard: creditCard ]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = 'Expired credit card' ].! !
 
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 16:01:02'!
+test13checkOutConConDatosValidosContactaAlMerchantProcessorYDevuelveTransactionID
+	| server userDict cartID catalog creditCard merchant |
+	userDict _ Dictionary new.
+	userDict
+		at: 'pepe'
+		put: 'pipo123'.
+	catalog _ Dictionary new.
+	catalog at: 123 put: 10 *peso.
+	merchant _ MerchantProcessorSimulator new.
+	server _ ((Market new withUsers: userDict) withBooksAndPrices: catalog) withMerchant: merchant .
+	cartID _ server
+		createCartWithUser: 'pepe'
+		andPass: 'pipo123'.
+	server
+		addBook: 123
+		withQuantity: 2
+		toCart: cartID.
+		
+	creditCard _ CreditCard withNumber: 123 
+								   date: DateAndTime tomorrow
+								   andOwner: 'Pepito'.
+				
+	self assert: (1234 = (server checkOutCart: cartID withCreditCard: creditCard))! !
+
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 16:00:27'!
+test14checkOutConConDatosValidosContactaAlMerchantProcessorYDevuelveError
+	| server userDict cartID catalog creditCard merchant |
+	userDict _ Dictionary new.
+	userDict
+		at: 'pepe'
+		put: 'pipo123'.
+	catalog _ Dictionary new.
+	catalog at: 123 put: 10 *peso.
+	merchant _ MerchantProcessorSimulator new.
+	server _ ((Market new withUsers: userDict) withBooksAndPrices: catalog) withMerchant: merchant .
+	cartID _ server
+		createCartWithUser: 'pepe'
+		andPass: 'pipo123'.
+	server
+		addBook: 123
+		withQuantity: 2
+		toCart: cartID.
+		
+	creditCard _ CreditCard withNumber: 1111
+								   date: DateAndTime tomorrow
+								   andOwner: 'Pepito'.
+								
+	self
+		should: [
+			server
+				checkOutCart: cartID
+				withCreditCard: creditCard ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = 'Error processing transaction' ].! !
+
 
 !classDefinition: #Carto category: #'TusLibros-Ejercicio'!
 Object subclass: #Carto
-	instanceVariableNames: 'books'
+	instanceVariableNames: 'books id'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
@@ -281,6 +343,11 @@ initialize
 
 	books _ Dictionary new.! !
 
+!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 14:41:49'!
+initializeWithID: aCartID
+	
+	id _ aCartID! !
+
 !Carto methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:05:59'!
 isEmpty
 	
@@ -290,6 +357,15 @@ isEmpty
 list
 	
 	^ books! !
+
+!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:12:16'!
+total
+	self shouldBeImplemented.! !
+
+!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:44:02'!
+totalWithCatalog: aCatalog
+
+	^ (books keys) inject: (0*peso) into: [ :amount :book | amount + (aCatalog at:book)*(books at: book) ].! !
 
 !Carto methodsFor: 'as yet unclassified' stamp: 'GF 10/31/2017 00:55:01'!
 validateNotEmpty
@@ -319,19 +395,36 @@ invalidQuantityDescription
 
 	^ 'Invalid quantity'! !
 
+!Carto class methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 14:42:21'!
+withID: aCartID 
+
+	^ self new initializeWithID: aCartID.! !
+
 
 !classDefinition: #Cashier category: #'TusLibros-Ejercicio'!
 Object subclass: #Cashier
-	instanceVariableNames: ''
+	instanceVariableNames: 'merchant'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'GF 10/31/2017 00:49:43'!
-checkOutCart: aCart withCreditCard: aCreditCard 
+!Cashier methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:44:36'!
+checkOutCart: aCart withCreditCard: aCreditCard withCatalog: aCatalog 
 	
 	aCart validateNotEmpty.
-	! !
+	aCreditCard validateNotExpired: DateAndTime now.
+	
+	^ merchant debitFrom: aCreditCard amount:( aCart totalWithCatalog: aCatalog).! !
+
+!Cashier methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:19:15'!
+initialize
+
+	catalog _ Dictionary new.! !
+
+!Cashier methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:04:02'!
+withMerchant: aMerchantProcessorSimulator 
+	
+	merchant _ aMerchantProcessorSimulator ! !
 
 
 !classDefinition: #CreditCard category: #'TusLibros-Ejercicio'!
@@ -341,18 +434,33 @@ Object subclass: #CreditCard
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'GF 10/31/2017 00:42:51'!
+!CreditCard methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 14:52:35'!
 initializeWithNumber: aNumber andDate: aDate andOwner: anOwner 
 	
 	number _ aNumber.
 	expirationDate _ aDate.
 	owner _ anOwner.! !
 
+!CreditCard methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:58:35'!
+number
+	^number! !
+
+!CreditCard methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 14:56:49'!
+validateNotExpired: aDateAndTime 
+	
+	( aDateAndTime < expirationDate )
+		ifFalse: [ self error: self class expiredCreditCardErrorDescription]! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'CreditCard class' category: #'TusLibros-Ejercicio'!
 CreditCard class
 	instanceVariableNames: ''!
+
+!CreditCard class methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 14:57:50'!
+expiredCreditCardErrorDescription
+	
+	^ 'Expired credit card'! !
 
 !CreditCard class methodsFor: 'as yet unclassified' stamp: 'GF 10/31/2017 00:41:54'!
 withNumber: aNumber date: aDate andOwner: anOwner
@@ -362,7 +470,7 @@ withNumber: aNumber date: aDate andOwner: anOwner
 
 !classDefinition: #Market category: #'TusLibros-Ejercicio'!
 Object subclass: #Market
-	instanceVariableNames: 'users editorial lastCart carts books cashier'
+	instanceVariableNames: 'users editorial lastCart carts cashier catalog'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
@@ -380,16 +488,16 @@ cart: aCartID
 	self validateCartID: aCartID.
 	^ carts at: aCartID ! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/31/2017 00:52:42'!
+!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:47:12'!
 checkOutCart: aCartID withCreditCard: aCreditCard
 
-	cashier checkOutCart: (self cart: aCartID) withCreditCard: aCreditCard.! !
+	^ cashier checkOutCart: (self cart: aCartID) withCreditCard: aCreditCard withCatalog: catalog.! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/31/2017 00:12:50'!
+!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 14:38:00'!
 createCartWith: aCartID
 	carts
 		at: aCartID
-		put: Carto new.! !
+		put: (Carto withID: aCartID).! !
 
 !Market methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 21:25:47'!
 createCartWithUser: aUser andPass: aPassword
@@ -399,19 +507,14 @@ createCartWithUser: aUser andPass: aPassword
 	lastCart _ lastCart + 1.
 	^ lastCart.! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/31/2017 00:44:29'!
+!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:30:20'!
 initialize
 	
 	lastCart _ 0.
 	carts _ Dictionary new.
 	users _ Dictionary new.
-	books _ OrderedCollection new.
+	catalog _ Dictionary new.
 	cashier _ Cashier new.! !
-
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 20:43:20'!
-initializeWithUsers: aUserDictionary 
-	users _ aUserDictionary .
-	! !
 
 !Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:36:33'!
 listCart: aCartID
@@ -421,10 +524,10 @@ listCart: aCartID
 	
 	! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:24:56'!
+!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:27:59'!
 validateBook: aBook
 	
-	(books includes: aBook)
+	(catalog includesKey: aBook)
 		ifFalse: [ self error: self class invalidBookDescription ].! !
 
 !Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:25:40'!
@@ -452,10 +555,15 @@ validateUser: aUser andPass: aPassword
 	(users includesKey: aUser) ifFalse: [ self error: self class invalidUserOrPasswordDescription ].
 	(users at: aUser) = aPassword ifFalse: [ self error: self class invalidUserOrPasswordDescription ].! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 22:04:41'!
-withBooks: aBookDict
+!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:21:35'!
+withBooksAndPrices: aCatalog
 	
-	books _ aBookDict! !
+	catalog _ aCatalog! !
+
+!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:03:50'!
+withMerchant: aMerchantProcessorSimulator 
+	
+	cashier withMerchant: aMerchantProcessorSimulator.! !
 
 !Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:04:46'!
 withUsers: aUserDictionary
@@ -482,3 +590,31 @@ invalidCartDescription
 !Market class methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:16:41'!
 invalidUserOrPasswordDescription
 	^ 'Invalid user or password'.! !
+
+
+!classDefinition: #MerchantProcessorSimulator category: #'TusLibros-Ejercicio'!
+Object subclass: #MerchantProcessorSimulator
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Ejercicio'!
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 16:01:22'!
+debitFrom: aCreditCard amount: anAmountOfMoney 
+	
+	 ( aCreditCard number = 1111)
+		ifTrue: [ 
+			self error: self class merchantProcessorErrorDescription ]
+		ifFalse: [
+			^ 1234 ]! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'MerchantProcessorSimulator class' category: #'TusLibros-Ejercicio'!
+MerchantProcessorSimulator class
+	instanceVariableNames: ''!
+
+!MerchantProcessorSimulator class methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 16:02:02'!
+merchantProcessorErrorDescription
+
+	^ 'Error processing transaction'.! !
