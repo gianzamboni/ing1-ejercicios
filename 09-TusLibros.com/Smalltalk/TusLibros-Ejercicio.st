@@ -13,46 +13,38 @@ TestCase subclass: #MarketTest
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!MarketTest methodsFor: 'createCart' stamp: 'GF 11/2/2017 19:55:16'!
-test01createCartConIdentificacionValidaDevuelveUnaIDdeCarrito
-	| server userDict cartID |
+!MarketTest methodsFor: 'createCart' stamp: 'GF 11/5/2017 20:04:15'!
+test01createCartConIdentificacionValidaCreaUnCarritoVacio
+	| market userDict cartID  |
 	userDict _ Dictionary new.
-	userDict
-		at: 'pepe'
-		put: 'pipo123'.
-	server _ Market new withUsers: userDict.
-	cartID _ server
-		createCartWithUser: 'pepe'
-		andPass: 'pipo123'
-		andTimeDuration: (Duration minutes: 30).
-	self assert: cartID = 1.
-	self assert: (server cart: 1) isEmpty.! !
+	userDict at: 'pepe' put: 'pipo123'.
+	
+	market _ (Market new withUsers: userDict) withCartIDGenerator: CartIDSimulator new.
+	
+	cartID _ market createCartWithUser: 'pepe' andPass: 'pipo123' andTimeDuration: (Duration minutes: 30).
+	
+	self assert: (market listCart: cartID) isEmpty.! !
 
-!MarketTest methodsFor: 'createCart' stamp: 'GF 11/2/2017 19:55:26'!
+!MarketTest methodsFor: 'createCart' stamp: 'GF 11/5/2017 20:12:34'!
 test02createCartConIdentificacionInvalidaDevuelveDescripcionDeError
-	| server |
-	server _ Market new.
-	self
-		should: [
-			server
-				createCartWithUser: 'pepe'
-				andPass: 'pipo123'
-				andTimeDuration: (Duration minutes: 30). ]
+	| market |
+	market _ Market new.
+	self should: [ market createCartWithUser: 'pepe'
+							andPass: 'pipo123'
+							andTimeDuration: (Duration minutes: 30). ]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = 'Invalid user or password' ].! !
 
 
-!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 19:55:34'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/5/2017 20:14:32'!
 test03addToCartConDatosValidosAgregaCorrectamenteElLibroACarritoVacio
 	| server userDict cartID catalog |
 	userDict _ Dictionary new.
-	userDict
-		at: 'pepe'
-		put: 'pipo123'.
+	userDict at: 'pepe' put: 'pipo123'.
 	catalog _ Dictionary new.
 	catalog at: 123 put: 10 *peso.
-	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
+	server _ ((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new) )withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'
@@ -61,13 +53,13 @@ test03addToCartConDatosValidosAgregaCorrectamenteElLibroACarritoVacio
 		addBook: 123
 		withQuantity: 3
 		toCart: cartID.
-	self assert:
-		((server cart: cartID)
-			hasBook: 123
-			times: 3).! !
+	
+	self assert: ((server listCart: cartID) at: 123) = 3.! !
 
-!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 19:55:40'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/5/2017 20:20:24'!
 test04addToCartConDatosValidosAgregaCorrectamenteUnLibroYaIncluido
+
+	"Esto en necesario?"
 	| server userDict cartID catalog |
 	userDict _ Dictionary new.
 	userDict
@@ -75,7 +67,7 @@ test04addToCartConDatosValidosAgregaCorrectamenteUnLibroYaIncluido
 		put: 'pipo123'.
 	catalog _ Dictionary new.
 	catalog at: 123 put: 10 *peso.
-	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
+	server _ ((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new)) withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'
@@ -88,19 +80,17 @@ test04addToCartConDatosValidosAgregaCorrectamenteUnLibroYaIncluido
 		addBook: 123
 		withQuantity: 2
 		toCart: cartID.
-	self assert:
-		((server cart: cartID)
-			hasBook: 123
-			times: 5).! !
+	
+	self assert: (((server listCart: cartID) at: 123) = 5).! !
 
-!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 19:55:48'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/5/2017 20:17:23'!
 test05addToCartConLibroInvalidoLevanteError
 	| server userDict cartID |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	server _ (Market new withUsers: userDict).
+	server _ (Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new).
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'
@@ -114,9 +104,9 @@ test05addToCartConLibroInvalidoLevanteError
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = 'Invalid book'.
-			self assert: (server cart: cartID) isEmpty ].! !
+			self assert: (server listCart: cartID) isEmpty ].! !
 
-!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 19:55:53'!
+!MarketTest methodsFor: 'addToCart' stamp: 'GF 11/5/2017 20:17:52'!
 test06addToCartConDatosValidosPeroCantidadInvalidaLevantaError
 	| server userDict cartID catalog |
 	userDict _ Dictionary new.
@@ -125,7 +115,7 @@ test06addToCartConDatosValidosPeroCantidadInvalidaLevantaError
 		put: 'pipo123'.
 	catalog _ Dictionary new.
 	catalog at: 123 put: 10 *peso.
-	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
+	server _ ((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new)) withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'
@@ -139,7 +129,7 @@ test06addToCartConDatosValidosPeroCantidadInvalidaLevantaError
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = 'Invalid quantity'.
-			self assert: (server cart: cartID) isEmpty ].! !
+			self assert: (server listCart: cartID) isEmpty ].! !
 
 !MarketTest methodsFor: 'addToCart' stamp: 'GF 11/2/2017 15:24:19'!
 test07addToCartConCarritoInvalidoLevantaError
@@ -158,21 +148,6 @@ test07addToCartConCarritoInvalidoLevantaError
 			self assert: anError messageText = 'Invalid cart' ].! !
 
 
-!MarketTest methodsFor: 'listCart' stamp: 'GF 11/2/2017 19:56:02'!
-test08listCartDeCarritoVacioDevuelveUnaColeccionVacia
-	| server userDict cartID |
-	userDict _ Dictionary new.
-	userDict
-		at: 'pepe'
-		put: 'pipo123'.
-	server _ Market new withUsers: userDict.
-	cartID _ server
-		createCartWithUser: 'pepe'
-		andPass: 'pipo123'
-		andTimeDuration: (Duration minutes: 30).
-		
-	self assert: (server listCart: cartID) isEmpty.! !
-
 !MarketTest methodsFor: 'listCart' stamp: 'GF 10/31/2017 00:16:53'!
 test10listCartDeCarritoInvalidoLevantaError
 	| server |
@@ -184,7 +159,7 @@ test10listCartDeCarritoInvalidoLevantaError
 			self assert: anError messageText = 'Invalid cart' ].! !
 
 
-!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 19:56:12'!
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/5/2017 20:22:05'!
 test09listCartDeCarritoConElementosListaLosLibrosAgregados
 	| server userDict cartID catalog expectedList |
 	
@@ -193,7 +168,7 @@ test09listCartDeCarritoConElementosListaLosLibrosAgregados
 	catalog _ Dictionary new.
 	catalog at: 1 put: 10 *peso.
 	catalog at: 2 put: 15 *peso.
-	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
+	server _ ((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new)) withBooksAndPrices: catalog.
 	cartID _ server createCartWithUser: 'pepe' andPass: 'pipo123' andTimeDuration: (Duration minutes: 30).
 	server addBook: 1 withQuantity: 3 toCart: cartID.
 	server addBook: 2 withQuantity: 2 toCart: cartID.
@@ -205,14 +180,14 @@ test09listCartDeCarritoConElementosListaLosLibrosAgregados
 	self assert: ((server listCart: cartID) = expectedList ).
 	! !
 
-!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 19:56:19'!
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/5/2017 20:22:24'!
 test11checkOutConCarritoVacioLevantaError
 	| server userDict cartID creditCard |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
 		put: 'pipo123'.
-	server _ Market new withUsers: userDict.
+	server _ (Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new).
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'
@@ -229,7 +204,7 @@ test11checkOutConCarritoVacioLevantaError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = 'Empty cart' ].! !
 
-!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 19:56:23'!
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/5/2017 20:22:40'!
 test12checkOutConTarjetaVencidaLevantaError
 	| server userDict cartID catalog creditCard |
 	userDict _ Dictionary new.
@@ -238,7 +213,7 @@ test12checkOutConTarjetaVencidaLevantaError
 		put: 'pipo123'.
 	catalog _ Dictionary new.
 	catalog at: 123 put: 10 *peso.
-	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
+	server _ ((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new)) withBooksAndPrices: catalog.
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'
@@ -261,9 +236,9 @@ test12checkOutConTarjetaVencidaLevantaError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = 'Expired credit card' ].! !
 
-!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 19:56:27'!
-test13checkOutConConDatosValidosContactaAlMerchantProcessorYDevuelveTransactionID
-	| server userDict cartID catalog creditCard merchant |
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/5/2017 21:49:01'!
+test13checkOutConConDatosValidosContactaAlMerchantProcessor
+	| market userDict cartID catalog creditCard merchant |
 	userDict _ Dictionary new.
 	userDict
 		at: 'pepe'
@@ -271,12 +246,12 @@ test13checkOutConConDatosValidosContactaAlMerchantProcessorYDevuelveTransactionI
 	catalog _ Dictionary new.
 	catalog at: 123 put: 10 *peso.
 	merchant _ MerchantProcessorSimulator new.
-	server _ ((Market new withUsers: userDict) withBooksAndPrices: catalog) withMerchant: merchant .
-	cartID _ server
+	market _ (((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new)) withBooksAndPrices: catalog) withMerchant: merchant .
+	cartID _ market
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'
 		andTimeDuration: (Duration minutes: 30).
-	server
+	market
 		addBook: 123
 		withQuantity: 2
 		toCart: cartID.
@@ -284,10 +259,12 @@ test13checkOutConConDatosValidosContactaAlMerchantProcessorYDevuelveTransactionI
 	creditCard _ CreditCard withNumber: 123 
 								   date: DateAndTime tomorrow
 								   andOwner: 'Pepito'.
-				
-	self assert: (1234 = (server checkOutCart: cartID withCreditCard: creditCard))! !
+								
+	market checkOutCart: cartID withCreditCard: creditCard.
+	
+	self assert: merchant wasContacted.! !
 
-!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 19:56:33'!
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/5/2017 20:23:39'!
 test14checkOutConConDatosValidosContactaAlMerchantProcessorYDevuelveError
 	| server userDict cartID catalog creditCard merchant |
 	userDict _ Dictionary new.
@@ -297,7 +274,7 @@ test14checkOutConConDatosValidosContactaAlMerchantProcessorYDevuelveError
 	catalog _ Dictionary new.
 	catalog at: 123 put: 10 *peso.
 	merchant _ MerchantProcessorSimulator new.
-	server _ ((Market new withUsers: userDict) withBooksAndPrices: catalog) withMerchant: merchant .
+	server _ (((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new)) withBooksAndPrices: catalog) withMerchant: merchant .
 	cartID _ server
 		createCartWithUser: 'pepe'
 		andPass: 'pipo123'
@@ -335,7 +312,7 @@ test15listPurchasesOfAUserWhithoutPurchasesReturnsAnEmptyCollection
 	self assert: pepeHistory bookList isEmpty.
 	self assert: pepeHistory totalAmount = 0. ! !
 
-!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 19:56:38'!
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/5/2017 22:15:46'!
 test16listPurchasesOfAUserWhithPurchasesReturnsCorrectHistory
 
 	| cartID catalog expectedList pepeHistory server userDict creditCard password username merchant |
@@ -350,7 +327,7 @@ test16listPurchasesOfAUserWhithPurchasesReturnsCorrectHistory
 	catalog at: 2 put: 15 *peso.
 	
 	merchant _ MerchantProcessorSimulator new.
-	server _ ((Market new withUsers: userDict) withBooksAndPrices: catalog) withMerchant: merchant .
+	server _ (((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new)) withBooksAndPrices: catalog) withMerchant: merchant .
 	
 	cartID _ server createCartWithUser: 'pepe' andPass: 'pipo123' andTimeDuration: (Duration minutes: 30).
 	server addBook: 1 withQuantity: 3 toCart: cartID.
@@ -364,9 +341,9 @@ test16listPurchasesOfAUserWhithPurchasesReturnsCorrectHistory
 	
 	pepeHistory _ server listPurchasesOf: username withPassword: password.
 	self assert: (pepeHistory bookList) = expectedList.
- 	self assert: pepeHistory totalAmount = 60. ! !
+ 	self assert: pepeHistory totalAmount = (60*peso). ! !
 
-!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/2/2017 19:57:27'!
+!MarketTest methodsFor: 'checkOutCart' stamp: 'GF 11/5/2017 22:29:08'!
 test17cartInvalidAfterLifespanHasEnded
 
 	| cartID catalog server userDict password username |
@@ -379,12 +356,33 @@ test17cartInvalidAfterLifespanHasEnded
 	catalog _ Dictionary new.
 	catalog at: 1 put: 10 *peso.
 	
-	server _ (Market new withUsers: userDict) withBooksAndPrices: catalog.
+	server _ ((Market new withUsers: userDict) withCartIDGenerator: (CartIDSimulator new)) withBooksAndPrices: catalog.
 	
 	cartID _ server createCartWithUser: 'pepe' andPass: 'pipo123' andTimeDuration: (Duration minutes: 0).
-	server addBook: 1 withQuantity: 3 toCart: cartID.
 	
-	! !
+	self should: [ server addBook: 1 withQuantity: 3 toCart: cartID ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = 'Expired cart' ].! !
+
+
+!classDefinition: #CartIDSimulator category: #'TusLibros-Ejercicio'!
+Object subclass: #CartIDSimulator
+	instanceVariableNames: 'lastID'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Ejercicio'!
+
+!CartIDSimulator methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 20:11:14'!
+initialize
+	
+	lastID _ 0! !
+
+!CartIDSimulator methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 20:10:13'!
+nextID
+	
+	lastID _ lastID + 1.
+	^ lastID! !
 
 
 !classDefinition: #Carto category: #'TusLibros-Ejercicio'!
@@ -394,21 +392,18 @@ Object subclass: #Carto
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!Carto methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:13:48'!
+!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 22:34:41'!
 addBook: aBook times: aQuantity
+	self validateNotExpired.
 	self validateQuantity: aQuantity.
 	( books includesKey: aBook ) 
 		ifTrue: [ books at: aBook put: ((books at: aBook) + aQuantity) ]
-		ifFalse: [ books at: aBook put: aQuantity ]! !
+		ifFalse: [ books at: aBook put: aQuantity ].
+	self updateExpirationDate.! !
 
 !Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 17:24:38'!
 books
 	^books! !
-
-!Carto methodsFor: 'as yet unclassified' stamp: 'GF 10/29/2017 22:10:21'!
-hasBook: aBook times: aQuantity
-	
-	^ ( books at: aBook ) = aQuantity.! !
 
 !Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 19:43:43'!
 initialize
@@ -428,19 +423,22 @@ isEmpty
 	
 	^ books isEmpty.! !
 
-!Carto methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:36:45'!
+!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 22:33:33'!
 list
-	
+	self validateNotExpired.
+	self updateExpirationDate.
 	^ books! !
 
-!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:12:16'!
-total
-	self shouldBeImplemented.! !
-
-!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:44:02'!
+!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 22:35:06'!
 totalWithCatalog: aCatalog
+	self validateNotExpired.
+	self updateExpirationDate.
+	^ (books keys) inject: (0*peso) into: [ :amount :book | amount + ((aCatalog at:book)*(books at: book))]! !
 
-	^ (books keys) inject: (0*peso) into: [ :amount :book | amount + (aCatalog at:book)*(books at: book) ].! !
+!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 22:34:18'!
+updateExpirationDate
+	
+	expirationDate _ (DateAndTime now) + timeToLive.! !
 
 !Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 17:24:15'!
 user
@@ -452,6 +450,13 @@ validateNotEmpty
 	
 	self isEmpty
 		ifTrue: [ self error: self class cartEmptyErrorDescription]! !
+
+!Carto methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 22:20:42'!
+validateNotExpired
+
+	(DateAndTime now > expirationDate)
+		 		ifTrue: [ self error: self class expiredCartErrorDescription ]
+		! !
 
 !Carto methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:17:21'!
 validateQuantity: aQuantity
@@ -470,6 +475,11 @@ cartEmptyErrorDescription
 	
 	^ 'Empty cart'! !
 
+!Carto class methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 22:26:11'!
+expiredCartErrorDescription
+	
+	^ 'Expired cart'! !
+
 !Carto class methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:18:30'!
 invalidQuantityDescription
 
@@ -479,6 +489,11 @@ invalidQuantityDescription
 withID: aCartID andUser: aUsername andTimeToLive: aTimeDuration 
 	
 	^ self new initializeWithID: aCartID andUser: aUsername andTimeToLive: aTimeDuration.! !
+
+!Carto class methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 22:26:08'!
+xpiredCartErrorDescription
+	
+	^ 'Expired cart'! !
 
 
 !classDefinition: #Cashier category: #'TusLibros-Ejercicio'!
@@ -567,49 +582,84 @@ withNumber: aNumber date: aDate andOwner: anOwner
 
 !classDefinition: #Market category: #'TusLibros-Ejercicio'!
 Object subclass: #Market
-	instanceVariableNames: 'users editorial lastCart carts cashier catalog userPurchasesHistory'
+	instanceVariableNames: 'users editorial lastCart carts cashier catalog userPurchasesHistory cartIDGenerator'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:24:12'!
+!Market methodsFor: 'interface' stamp: 'GF 10/30/2017 16:24:12'!
 addBook: aBook withQuantity: aQuantity toCart: aCartID
 	
 	self validateCartID: aCartID.
 	self validateBook: aBook.
 	(carts at: aCartID) addBook: aBook times: aQuantity.! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:32:57'!
-cart: aCartID
+!Market methodsFor: 'interface' stamp: 'GF 11/5/2017 20:02:07'!
+checkOutCart: aCartID withCreditCard: aCreditCard
+
+	^ cashier checkOutCart: (self cart: aCartID ) withCreditCard: aCreditCard.! !
+
+!Market methodsFor: 'interface' stamp: 'GF 11/5/2017 20:08:31'!
+createCartWithUser: aUser andPass: aPassword andTimeDuration: aTimeDuration
+
+	| newID |
+	
+	self validateUser: aUser andPass: aPassword.
+	newID _ cartIDGenerator nextID.
+	carts at: newID put: (Carto withID: newID andUser: aUser andTimeToLive: aTimeDuration).
+
+	^newID.! !
+
+!Market methodsFor: 'interface' stamp: 'GF 11/5/2017 20:01:51'!
+listCart: aCartID
 
 	self validateCartID: aCartID.
-	^ carts at: aCartID ! !
+	^(self cart: aCartID) list.
+	
+	! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 17:17:39'!
+!Market methodsFor: 'interface' stamp: 'GF 11/2/2017 16:49:51'!
+listPurchasesOf: aUsername withPassword: aPassword
+	
+	^ userPurchasesHistory at: aUsername! !
+
+
+!Market methodsFor: 'private' stamp: 'GF 11/5/2017 20:02:58'!
+cart: aCartID
+	
+	self validateCartID: aCartID .
+	^ carts at: aCartID.! !
+
+!Market methodsFor: 'private' stamp: 'GF 11/2/2017 17:17:39'!
 catalog
 
 	^catalog! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 17:17:19'!
-checkOutCart: aCartID withCreditCard: aCreditCard
+!Market methodsFor: 'private' stamp: 'GF 11/5/2017 21:04:21'!
+logPurchaseOfUser: aUsername andBooks: aPurchase andAmount: totalAmount 
 
-	^ cashier checkOutCart: (self cart: aCartID) withCreditCard: aCreditCard.! !
+	(userPurchasesHistory at: aUsername) addPurchase: aPurchase andAmount: totalAmount! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 19:39:32'!
-createCartWith: aCartID andUser: aUsername andTimeToLive: aTimeDuration
-	carts
-		at: aCartID
-		put: (Carto withID: aCartID andUser: aUsername andTimeToLive: aTimeDuration).! !
+!Market methodsFor: 'private' stamp: 'GF 11/2/2017 15:27:59'!
+validateBook: aBook
+	
+	(catalog includesKey: aBook)
+		ifFalse: [ self error: self class invalidBookDescription ].! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 19:53:36'!
-createCartWithUser: aUser andPass: aPassword andTimeDuration: aDuration
+!Market methodsFor: 'private' stamp: 'GF 10/30/2017 16:25:40'!
+validateCartID: aCartID
 
-	self validateUser: aUser andPass: aPassword.
-	self createCartWith: (lastCart+1) andUser: aUser andTimeToLive: aDuration.
-	lastCart _ lastCart + 1.
-	^ lastCart.! !
+	(carts includesKey: aCartID)
+		ifFalse: [ self error: self class invalidCartDescription ].! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 17:13:19'!
+!Market methodsFor: 'private' stamp: 'GF 10/30/2017 16:26:04'!
+validateUser: aUser andPass: aPassword
+
+	(users includesKey: aUser) ifFalse: [ self error: self class invalidUserOrPasswordDescription ].
+	(users at: aUser) = aPassword ifFalse: [ self error: self class invalidUserOrPasswordDescription ].! !
+
+
+!Market methodsFor: 'initialization' stamp: 'GF 11/5/2017 19:55:31'!
 initialize
 	
 	lastCart _ 0.
@@ -619,66 +669,22 @@ initialize
 	cashier _ Cashier withMarket: self.
 	userPurchasesHistory _ Dictionary new.! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:36:33'!
-listCart: aCartID
-
-	self validateCartID: aCartID.
-	^(self cart: aCartID) list.
-	
-	! !
-
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 16:49:51'!
-listPurchasesOf: aUsername withPassword: aPassword
-	
-	^ userPurchasesHistory at: aUsername! !
-
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 17:31:50'!
-logPurchaseOfUser: aUsername andBooks: aPurchase andAmount: totalAmount 
-
-	self shouldBeImplemented! !
-
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:27:59'!
-validateBook: aBook
-	
-	(catalog includesKey: aBook)
-		ifFalse: [ self error: self class invalidBookDescription ].! !
-
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:25:40'!
-validateCartID: aCartID
-
-	(carts includesKey: aCartID)
-		ifFalse: [ self error: self class invalidCartDescription ].! !
-
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 19:24:43'!
-validateExpiredCard: aCreditCardExpirationDate
-
-	| expirationDateYearNumber expirationDateMonthNumber expirationDate |
-
-	expirationDateYearNumber _ aCreditCardExpirationDate rem: 10000.
-	expirationDateMonthNumber _ aCreditCardExpirationDate div: 10000.
-
-	expirationDate _ DateAndTime year: expirationDateYearNumber month: expirationDateMonthNumber day: 1.
-	
-	(expirationDate  < DateAndTime  now) 
-		ifTrue: [ self error: self class ExpiredCreditCardErrorDescription]! !
-
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 10/30/2017 16:26:04'!
-validateUser: aUser andPass: aPassword
-
-	(users includesKey: aUser) ifFalse: [ self error: self class invalidUserOrPasswordDescription ].
-	(users at: aUser) = aPassword ifFalse: [ self error: self class invalidUserOrPasswordDescription ].! !
-
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:21:35'!
+!Market methodsFor: 'initialization' stamp: 'GF 11/2/2017 15:21:35'!
 withBooksAndPrices: aCatalog
 	
 	catalog _ aCatalog! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 15:03:50'!
+!Market methodsFor: 'initialization' stamp: 'GF 11/5/2017 19:56:01'!
+withCartIDGenerator: aCartIDSimulator 
+	
+	cartIDGenerator _ aCartIDSimulator ! !
+
+!Market methodsFor: 'initialization' stamp: 'GF 11/2/2017 15:03:50'!
 withMerchant: aMerchantProcessorSimulator 
 	
 	cashier withMerchant: aMerchantProcessorSimulator.! !
 
-!Market methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 16:20:12'!
+!Market methodsFor: 'initialization' stamp: 'GF 11/2/2017 16:20:12'!
 withUsers: aUserDictionary
 	
 	users _ aUserDictionary.
@@ -712,19 +718,38 @@ invalidUserOrPasswordDescription
 
 !classDefinition: #MerchantProcessorSimulator category: #'TusLibros-Ejercicio'!
 Object subclass: #MerchantProcessorSimulator
-	instanceVariableNames: ''
+	instanceVariableNames: 'wasContacted transactions'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
 
-!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 16:01:22'!
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 21:27:20'!
 debitFrom: aCreditCard amount: anAmountOfMoney 
 	
-	 ( aCreditCard number = 1111)
+	wasContacted  _ true.
+	
+	transactions add: (Transaction ofAmount: anAmountOfMoney withCreditCard: aCreditCard).
+	( aCreditCard number = 1111)
 		ifTrue: [ 
 			self error: self class merchantProcessorErrorDescription ]
 		ifFalse: [
 			^ 1234 ]! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 21:29:06'!
+initialize
+	
+	wasContacted _ false.
+	transactions _ OrderedCollection new.! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 21:22:45'!
+transactions
+
+	^transactions! !
+
+!MerchantProcessorSimulator methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 21:17:56'!
+wasContacted
+	
+	^ wasContacted! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -738,12 +763,47 @@ merchantProcessorErrorDescription
 	^ 'Error processing transaction'.! !
 
 
+!classDefinition: #Transaction category: #'TusLibros-Ejercicio'!
+Object subclass: #Transaction
+	instanceVariableNames: 'amount creditCard'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Ejercicio'!
+
+!Transaction methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 21:17:21'!
+initializeWithAmount: anAmount withCreditCart: aCreditCard 
+	
+	amount _ anAmount .
+	creditCard _ aCreditCard.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Transaction class' category: #'TusLibros-Ejercicio'!
+Transaction class
+	instanceVariableNames: ''!
+
+!Transaction class methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 21:23:48'!
+ofAmount: anAmount withCreditCard: aCreditCard
+	^ self new initializeWithAmount: anAmount withCreditCart: aCreditCard .! !
+
+
 !classDefinition: #UserHistory category: #'TusLibros-Ejercicio'!
 Object subclass: #UserHistory
 	instanceVariableNames: 'books totalAmount'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Ejercicio'!
+
+!UserHistory methodsFor: 'as yet unclassified' stamp: 'GF 11/5/2017 21:11:16'!
+addPurchase: aPurchase andAmount: anAmount 
+	
+	totalAmount _ totalAmount + anAmount.
+	
+	(aPurchase keys) do: [ :aBook | 
+		( books includesKey: aBook ) 
+			ifTrue: [ books at: aBook put: ((books at: aBook) + (aPurchase at: aBook)) ]
+			ifFalse: [ books at: aBook put: (aPurchase at: aBook) ]
+			]! !
 
 !UserHistory methodsFor: 'as yet unclassified' stamp: 'GF 11/2/2017 16:23:07'!
 bookList
